@@ -381,14 +381,14 @@
     </div>
 
     <div class="container">
-        <!-- 日历下载 -->
+        <!-- 订阅日历 -->
         <div class="calendar-bar">
             <div class="cal-icon">📅</div>
             <div class="cal-text">
-                <h3>导出到日历</h3>
-                <p>生成 .ics 日程文件，一键导入手机/电脑日历，到期自动提醒</p>
+                <h3>订阅疫苗日历</h3>
+                <p>生成订阅链接，手机一键订阅，疫苗日程自动同步到日历并提醒</p>
             </div>
-            <button class="btn-calendar" onclick="openCalendarModal()">设置提醒并下载</button>
+            <button class="btn-calendar" onclick="openCalendarModal()">生成订阅链接</button>
         </div>
 
         <div class="progress-section">
@@ -457,11 +457,11 @@
     </div>
 </div>
 
-<!-- ===== 日历设置弹窗 ===== -->
+<!-- ===== 日历订阅弹窗 ===== -->
 <div class="modal-overlay" id="calendarModal">
     <div class="modal">
         <div class="modal-header">
-            <h2>📅 导出疫苗日程到日历</h2>
+            <h2>📅 订阅疫苗日历</h2>
             <button class="modal-close" onclick="closeCalendarModal()">&times;</button>
         </div>
         <div class="modal-body">
@@ -483,24 +483,69 @@
             </div>
 
             <div class="scope-section">
-                <h3>导出范围</h3>
+                <h3>订阅范围</h3>
                 <div class="scope-options">
                     <button class="scope-opt active" onclick="setScope('all', this)">全部疫苗</button>
-                    <button class="scope-opt" onclick="setScope('unchecked', this)">仅未接种</button>
                     <button class="scope-opt" onclick="setScope('free', this)">仅免费</button>
                     <button class="scope-opt" onclick="setScope('paid', this)">仅自费</button>
                 </div>
             </div>
 
             <div class="preview-list">
-                <h3>将导出以下日程：</h3>
+                <h3>将订阅以下日程：</h3>
                 <div id="previewItems"></div>
                 <div class="preview-count" id="previewCount"></div>
+            </div>
+
+            <!-- 订阅链接区域 -->
+            <div id="subscribeSection" style="display:none; margin-top: 20px;">
+                <div style="background:#F0FDF4; border:2px solid #86EFAC; border-radius:12px; padding:16px;">
+                    <h3 style="font-size:0.95em; color:#065F46; margin-bottom:8px;">你的订阅链接已生成</h3>
+                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+                        <input type="text" id="subscribeUrl" readonly
+                            style="flex:1; padding:10px 12px; border:2px solid #D1D5DB; border-radius:8px;
+                            font-size:0.82em; background:#fff; color:var(--text); outline:none;">
+                        <button onclick="copyUrl()" id="copyBtn"
+                            style="padding:10px 16px; background:var(--primary); color:white; border:none;
+                            border-radius:8px; font-weight:600; cursor:pointer; white-space:nowrap; font-size:0.88em;">
+                            复制
+                        </button>
+                    </div>
+
+                    <div style="background:white; border-radius:10px; padding:14px; margin-bottom: 8px;">
+                        <h4 style="font-size:0.9em; margin-bottom:8px;">📱 iPhone 订阅方法：</h4>
+                        <ol style="font-size:0.82em; color:var(--text-secondary); padding-left:18px; line-height:1.8;">
+                            <li>点击下方 <b>「一键订阅（iPhone）」</b> 按钮</li>
+                            <li>系统弹出「要订阅日历吗？」，点击 <b>「订阅」</b></li>
+                            <li>打开「日历」App 即可看到所有疫苗日程</li>
+                        </ol>
+                    </div>
+
+                    <div style="background:white; border-radius:10px; padding:14px; margin-bottom: 8px;">
+                        <h4 style="font-size:0.9em; margin-bottom:8px;">📱 安卓手机订阅方法：</h4>
+                        <ol style="font-size:0.82em; color:var(--text-secondary); padding-left:18px; line-height:1.8;">
+                            <li>复制上方链接</li>
+                            <li>打开 Google 日历 → 设置 → 添加日历 → 通过 URL 订阅</li>
+                            <li>粘贴链接并确认</li>
+                        </ol>
+                    </div>
+
+                    <div style="background:white; border-radius:10px; padding:14px;">
+                        <h4 style="font-size:0.9em; margin-bottom:8px;">💻 电脑订阅方法：</h4>
+                        <ol style="font-size:0.82em; color:var(--text-secondary); padding-left:18px; line-height:1.8;">
+                            <li>macOS 日历：菜单 → 文件 → 新建日历订阅 → 粘贴链接</li>
+                            <li>Outlook：添加日历 → 从 Internet → 粘贴链接</li>
+                        </ol>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeCalendarModal()">取消</button>
-            <button class="btn-download" onclick="downloadICS()">📥 下载日历文件 (.ics)</button>
+            <button class="btn-download" onclick="generateSubscribeUrl()" id="btnGenerate">🔗 生成订阅链接</button>
+            <a id="btnWebcal" href="#" style="display:none; padding:10px 20px; background:linear-gradient(135deg,#2563EB,#3B82F6);
+                color:white; border:none; border-radius:10px; font-size:0.95em; font-weight:600;
+                text-decoration:none; cursor:pointer;">📱 一键订阅（iPhone）</a>
         </div>
     </div>
 </div>
@@ -873,91 +918,65 @@ function updatePreview() {
         `共 ${items.length} 条日程，每条提前 ${reminderDays} 天提醒`;
 }
 
-// ===== ICS 生成 & 下载 =====
-function pad2(n) { return n < 10 ? '0'+n : ''+n; }
-function toICSDate(date) {
-    return date.getFullYear() + pad2(date.getMonth()+1) + pad2(date.getDate());
-}
-function toICSDateTime(date) {
-    return toICSDate(date) + 'T090000';
-}
-function generateUID() {
-    return 'vaccine-' + Math.random().toString(36).substr(2,9) + '@baby-plan';
-}
-function escapeICS(str) {
-    return str.replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
-}
-
-function downloadICS() {
-    // 自定义天数
+// ===== 日历订阅链接生成 =====
+function getSubscribeUrl(protocol) {
     if (document.getElementById('customReminder').classList.contains('show')) {
         reminderDays = parseInt(document.getElementById('customDays').value) || 5;
     }
-
-    const items = getFilteredForCalendar();
-    if (!items.length) { alert('没有可导出的日程'); return; }
-
-    const reminderMinutes = reminderDays * 24 * 60;
-    let cal = [
-        'BEGIN:VCALENDAR',
-        'VERSION:2.0',
-        'PRODID:-//BabyVaccinePlan//CN',
-        'CALSCALE:GREGORIAN',
-        'METHOD:PUBLISH',
-        `X-WR-CALNAME:${babyName}的疫苗接种计划`,
-        'X-WR-TIMEZONE:Asia/Shanghai'
-    ];
-
-    items.forEach(it => {
-        const endDate = new Date(it.date);
-        endDate.setDate(endDate.getDate() + 1);
-
-        const desc = [
-            `疫苗：${it.name}`,
-            `预防：${it.prevent}`,
-            `剂次：${it.dose}`,
-            `类型：${it.type === 'free' ? '免费（一类）' : '自费（二类）'}`,
-            `价格：${it.price}`,
-            `品牌：${it.brand}`,
-            `备注：${it.note}`
-        ].join('\\n');
-
-        cal.push('BEGIN:VEVENT');
-        cal.push(`UID:${generateUID()}`);
-        cal.push(`DTSTART;VALUE=DATE:${toICSDate(it.date)}`);
-        cal.push(`DTEND;VALUE=DATE:${toICSDate(endDate)}`);
-        cal.push(`SUMMARY:💉 ${babyName} - ${it.name}`);
-        cal.push(`DESCRIPTION:${escapeICS(desc)}`);
-        cal.push('LOCATION:社区卫生服务中心');
-        cal.push('BEGIN:VALARM');
-        cal.push('ACTION:DISPLAY');
-        cal.push(`DESCRIPTION:${babyName}的疫苗接种提醒：${it.name}`);
-        cal.push(`TRIGGER:-P${reminderDays}D`);
-        cal.push('END:VALARM');
-        // 接种当天早上再提醒一次
-        cal.push('BEGIN:VALARM');
-        cal.push('ACTION:DISPLAY');
-        cal.push(`DESCRIPTION:今天要带${babyName}去接种：${it.name}`);
-        cal.push('TRIGGER:-PT2H');
-        cal.push('END:VALARM');
-        cal.push('END:VEVENT');
+    const birthVal = localStorage.getItem('baby_birth');
+    const params = new URLSearchParams({
+        name: babyName,
+        birth: birthVal,
+        reminder: reminderDays,
+        scope: calendarScope
     });
-
-    cal.push('END:VCALENDAR');
-
-    const blob = new Blob([cal.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${babyName}的疫苗接种计划.ics`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    closeCalendarModal();
-    alert(`已下载 ${items.length} 条日程！\n\n📱 iPhone用户：打开文件自动导入日历\n📱 安卓用户：用日历App打开文件\n💻 电脑用户：双击文件导入Outlook/日历\n\n每条日程会提前 ${reminderDays} 天 + 当天 提醒您`);
+    const base = window.location.origin + '/api/calendar?' + params.toString();
+    if (protocol === 'webcal') {
+        return base.replace(/^https?:/, 'webcal:');
+    }
+    return base;
 }
+
+function generateSubscribeUrl() {
+    const httpsUrl = getSubscribeUrl('https');
+    const webcalUrl = getSubscribeUrl('webcal');
+
+    document.getElementById('subscribeUrl').value = httpsUrl;
+    document.getElementById('subscribeSection').style.display = 'block';
+    document.getElementById('btnGenerate').style.display = 'none';
+    document.getElementById('btnWebcal').style.display = 'inline-block';
+    document.getElementById('btnWebcal').href = webcalUrl;
+
+    // 滚动到订阅区域
+    document.getElementById('subscribeSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function copyUrl() {
+    const input = document.getElementById('subscribeUrl');
+    input.select();
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '已复制!';
+        btn.style.background = '#059669';
+        setTimeout(() => { btn.textContent = '复制'; btn.style.background = 'var(--primary)'; }, 2000);
+    }).catch(() => {
+        // fallback
+        document.execCommand('copy');
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '已复制!';
+        setTimeout(() => { btn.textContent = '复制'; }, 2000);
+    });
+}
+
+// 重置弹窗状态
+const origOpenModal = openCalendarModal;
+openCalendarModal = function() {
+    document.getElementById('subscribeSection').style.display = 'none';
+    document.getElementById('btnGenerate').style.display = 'inline-block';
+    document.getElementById('btnWebcal').style.display = 'none';
+    origOpenModal();
+};
+
 
 // 点击遮罩关闭
 document.getElementById('calendarModal').addEventListener('click', function(e) {
