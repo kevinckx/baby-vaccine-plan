@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝宝疫苗接种计划</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #4F46E5;
+            --primary-light: #818CF8;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --bg: #F8FAFC;
+            --text: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
+            --free-bg: #ECFDF5;
+            --free-border: #6EE7B7;
+            --paid-bg: #FFF7ED;
+            --paid-border: #FDBA74;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        .header h1 { font-size: 2em; margin-bottom: 8px; position: relative; }
+        .header .baby-icon { font-size: 3em; margin-bottom: 10px; display: block; }
+        .header p { opacity: 0.9; font-size: 1.1em; position: relative; }
+        .stats-bar {
+            display: flex; justify-content: center; gap: 30px;
+            margin-top: 20px; position: relative; flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; }
+        .stat-item .num { font-size: 1.8em; font-weight: 700; }
+        .stat-item .label { font-size: 0.85em; opacity: 0.8; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .filter-bar {
+            display: flex; gap: 10px; margin: 20px 0;
+            flex-wrap: wrap; align-items: center;
+        }
+        .filter-btn {
+            padding: 8px 20px; border: 2px solid var(--border);
+            border-radius: 25px; background: white; cursor: pointer;
+            font-size: 0.9em; transition: all 0.2s; font-weight: 500;
+        }
+        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .filter-btn.active-free { background: var(--success); color: white; border-color: var(--success); }
+        .filter-btn.active-paid { background: #F59E0B; color: white; border-color: #F59E0B; }
+        .progress-section {
+            background: white; border-radius: 16px; padding: 20px;
+            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .progress-bar-container {
+            background: #E2E8F0; border-radius: 10px; height: 12px;
+            overflow: hidden; margin-top: 10px;
+        }
+        .progress-bar {
+            height: 100%; border-radius: 10px;
+            background: linear-gradient(90deg, #10B981, #34D399);
+            transition: width 0.5s ease;
+        }
+        .progress-text {
+            display: flex; justify-content: space-between;
+            font-size: 0.9em; color: var(--text-secondary);
+        }
+        .cost-section {
+            background: white; border-radius: 16px; padding: 20px;
+            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .cost-row {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 6px 0;
+            font-size: 0.95em;
+        }
+        .cost-row .cost-label { color: var(--text-secondary); }
+        .cost-row .cost-value { font-weight: 700; color: #DC2626; font-size: 1.1em; }
+        .age-group { margin-bottom: 30px; }
+        .age-group-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 15px; padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+        .age-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white; padding: 6px 16px; border-radius: 20px;
+            font-weight: 600; font-size: 0.95em; white-space: nowrap;
+        }
+        .age-date { color: var(--text-secondary); font-size: 0.9em; }
+        .age-status {
+            margin-left: auto; font-size: 0.85em; padding: 4px 12px;
+            border-radius: 12px; font-weight: 500;
+        }
+        .status-done { background: #ECFDF5; color: #059669; }
+        .status-current { background: #EFF6FF; color: #2563EB; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .status-upcoming { background: #F1F5F9; color: #64748B; }
+        .vaccine-card {
+            background: white; border-radius: 12px; padding: 16px 20px;
+            margin-bottom: 10px; border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: all 0.2s; cursor: pointer;
+        }
+        .vaccine-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateX(4px);
+        }
+        .vaccine-card.free { border-left-color: var(--success); }
+        .vaccine-card.paid { border-left-color: #F59E0B; }
+        .vaccine-card.checked { opacity: 0.6; background: #F8FAFC; }
+        .vaccine-card.checked .vaccine-name { text-decoration: line-through; }
+        .vaccine-top { display: flex; align-items: flex-start; gap: 12px; }
+        .vaccine-checkbox {
+            width: 22px; height: 22px; border-radius: 6px;
+            border: 2px solid var(--border); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 2px; transition: all 0.2s;
+        }
+        .vaccine-checkbox.checked { background: var(--success); border-color: var(--success); }
+        .vaccine-checkbox.checked::after { content: '\2713'; color: white; font-size: 14px; font-weight: 700; }
+        .vaccine-info { flex: 1; }
+        .vaccine-name { font-weight: 600; font-size: 1.05em; margin-bottom: 4px; }
+        .vaccine-desc { color: var(--text-secondary); font-size: 0.88em; margin-bottom: 6px; }
+        .vaccine-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag { padding: 2px 10px; border-radius: 12px; font-size: 0.78em; font-weight: 500; }
+        .tag-free { background: var(--free-bg); color: #059669; border: 1px solid var(--free-border); }
+        .tag-paid { background: var(--paid-bg); color: #D97706; border: 1px solid var(--paid-border); }
+        .tag-brand { background: #EFF6FF; color: #2563EB; border: 1px solid #93C5FD; }
+        .tag-price { background: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; }
+        .tag-dose { background: #F5F3FF; color: #7C3AED; border: 1px solid #C4B5FD; }
+        .vaccine-detail {
+            display: none; margin-top: 12px; padding-top: 12px;
+            border-top: 1px dashed var(--border); font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        .vaccine-detail.show { display: block; }
+        .detail-row { display: flex; margin-bottom: 6px; }
+        .detail-label { font-weight: 600; color: var(--text); min-width: 80px; }
+        .legend { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; font-size: 0.9em; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
+        .dot-free { background: var(--success); }
+        .dot-paid { background: #F59E0B; }
+        .footer {
+            text-align: center; padding: 30px;
+            color: var(--text-secondary); font-size: 0.85em;
+        }
+        .tip-box {
+            background: linear-gradient(135deg, #EFF6FF, #F5F3FF);
+            border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+            border: 1px solid #C7D2FE;
+        }
+        .tip-box h3 { color: var(--primary); font-size: 0.95em; margin-bottom: 6px; }
+        .tip-box p { font-size: 0.88em; color: var(--text-secondary); }
+        .section-title {
+            font-size: 1.2em; font-weight: 700; margin: 30px 0 15px;
+            padding-left: 12px; border-left: 4px solid var(--primary);
+        }
+        .family-card {
+            background: white; border-radius: 12px; padding: 14px 20px;
+            margin-bottom: 8px; border-left: 4px solid #8B5CF6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .family-card .fc-top { display: flex; justify-content: space-between; align-items: center; }
+        .family-card .fc-name { font-weight: 600; }
+        .family-card .fc-age { color: var(--text-secondary); font-size: 0.85em; }
+        .family-card .fc-price { color: #DC2626; font-weight: 600; }
+        .family-card .fc-note { color: var(--text-secondary); font-size: 0.85em; margin-top: 4px; }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.5em; }
+            .stats-bar { gap: 15px; }
+            .stat-item .num { font-size: 1.4em; }
+            .vaccine-card { padding: 12px 14px; }
+            .filter-bar { gap: 6px; }
+            .filter-btn { padding: 6px 14px; font-size: 0.82em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <span class="baby-icon">👶</span>
+    <h1>宝宝疫苗接种计划</h1>
+    <p>出生日期：2026年2月9日</p>
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="num" id="totalCount">0</div>
+            <div class="label">总接种次数</div>
+        </div>
+        <div class="stat-item">
+            <div class="num" id="doneCount">0</div>
+            <div class="label">已完成</div>
+        </div>
+        <div class="stat-item">
+            <div class="num" id="nextDays">-</div>
+            <div class="label">下次接种</div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="progress-section">
+        <div class="progress-text">
+            <span>接种进度</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div class="cost-section">
+        <div class="cost-row">
+            <span class="cost-label">自费疫苗预估总费用</span>
+            <span class="cost-value" id="totalCost">-</span>
+        </div>
+        <div class="cost-row">
+            <span class="cost-label">已花费</span>
+            <span class="cost-value" id="paidCost" style="color: var(--success);">-</span>
+        </div>
+    </div>
+
+    <div class="tip-box">
+        <h3>💡 温馨提示</h3>
+        <p>免费疫苗（一类）为国家免疫规划疫苗，必须接种。自费疫苗（二类）自愿接种，但强烈建议在经济条件允许下尽量接种。本计划已选择<b>五联疫苗</b>方案（替代免费百白破+脊灰+Hib，大幅减少针次）。点击卡片查看详情，勾选已接种疫苗记录进度。</p>
+    </div>
+
+    <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterVaccines('all')">全部</button>
+        <button class="filter-btn" onclick="filterVaccines('free')">免费疫苗</button>
+        <button class="filter-btn" onclick="filterVaccines('paid')">自费疫苗</button>
+        <button class="filter-btn" onclick="filterVaccines('unchecked')">未接种</button>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot dot-free"></div> 免费（一类）</div>
+        <div class="legend-item"><div class="legend-dot dot-paid"></div> 自费（二类）</div>
+    </div>
+
+    <div id="vaccineList"></div>
+
+    <!-- 流感疫苗 -->
+    <div class="section-title">流感疫苗（每年接种）</div>
+    <div class="family-card">
+        <div class="fc-top">
+            <span class="fc-name">儿童流感疫苗</span>
+            <span class="fc-age">6-35月龄</span>
+        </div>
+        <div class="fc-note">每年流感季前接种。首次接种需打2剂（间隔≥4周），之后每年1剂。6月龄以上即可开始。</div>
+    </div>
+    <div class="family-card">
+        <div class="fc-top">
+            <span class="fc-name">成人流感疫苗</span>
+            <span class="fc-age">3周岁以上</span>
+        </div>
+        <div class="fc-note">看情况，每年流感季前接种1剂。</div>
+    </div>
+
+    <!-- 家庭成员疫苗 -->
+    <div class="section-title">家庭成员疫苗参考</div>
+    <div id="familyList"></div>
+</div>
+
+<div class="footer">
+    <p>数据来源于飞书疫苗计划表，仅供参考，具体请以当地社区卫生服务中心安排为准</p>
+    <p>价格为参考价，实际价格以接种点为准</p>
+</div>
+
+<script>
+const BIRTH_DATE = new Date(2026, 1, 9); // 2026年2月9日
+
+const vaccineData = [
+    // ===== 出生时 =====
+    {
+        age: "出生24小时内",
+        monthOffset: 0,
+        vaccines: [
+            {
+                name: "乙肝疫苗 1/3",
+                type: "free",
+                dose: "第1剂/共3剂",
+                prevent: "乙型肝炎",
+                brand: "深圳康泰 / 大连汉信",
+                price: "免费",
+                priceNum: 0,
+                note: "出生后24小时内接种，越早越好。如母亲为乙肝携带者，需同时注射乙肝免疫球蛋白。"
+            },
+            {
+                name: "卡介苗",
+                type: "free",
+                dose: "1剂",
+                prevent: "结核病",
+                brand: "上海生物制品研究所",
+                price: "免费",
+                priceNum: 0,
+                note: "出生后尽早接种，最迟不超过3个月。早产儿或体重<2500g需推迟。"
+            }
+        ]
+    },
+    // ===== 2月龄 =====
+    {
+        age: "2月龄",
+        monthOffset: 2,
+        vaccines: [
+            {
+                name: "乙肝疫苗 2/3",
+                type: "free",
+                dose: "第2剂/共3剂",
+                prevent: "乙型肝炎",
+                brand: "深圳康泰 / 大连汉信",
+                price: "免费",
+                priceNum: 0,
+                note: "与第1剂间隔≥28天。"
+            },
+            {
+                name: "五价轮状病毒疫苗（口服）1/3",
+                type: "paid",
+                dose: "第1剂/共3剂",
+                prevent: "重度轮状病毒胃肠炎",
+                brand: "默沙东「乐儿德」五价口服",
+                price: "308元/剂",
+                priceNum: 308,
+                note: "第一针要求在84天（12周龄）内完成。预防重度轮状病毒胃肠炎，全程3剂，保护长达7年。"
+            },
+            {
+                name: "五联疫苗 1/4",
+                type: "paid",
+                dose: "第1剂/共4剂",
+                prevent: "白喉、破伤风、百日咳、脊灰、Hib",
+                brand: "赛诺菲巴斯德「潘太欣」",
+                price: "624元/剂",
+                priceNum: 624,
+                note: "五联包含：白喉、破伤风、百日咳、脊灰、Hib。可替代免费百白破+脊灰+Hib三种疫苗，12针减至4针。"
+            }
+        ]
+    },
+    // ===== 3月龄 =====
+    {
+        age: "3月龄",
+        monthOffset: 3,
+        vaccines: [
+            {
+                name: "13价肺炎球菌疫苗 1/4",
+                type: "paid",
+                dose: "第1剂/共4剂",
+                prevent: "肺炎球菌引起的肺炎、脑膜炎、中耳炎",
+                brand: "辉瑞「沛儿13」/ 沃森生物",
+                price: "626元/剂",
+                priceNum: 626,
+                note: "6周龄-6周岁前可接种，共4剂。强烈推荐！肺炎球菌是5岁以下儿童重症肺炎首要病因。"
+            },
+            {
+                name: "五联疫苗 2/4",
+                type: "paid",
+                dose: "第2剂/共4剂",
+                prevent: "白喉、破伤风、百日咳、脊灰、Hib",
+                brand: "赛诺菲巴斯德「潘太欣」",
+                price: "624元/剂",
+                priceNum: 624,
+                note: "与第1剂间隔≥28天。"
+            },
+            {
+                name: "五价轮状病毒疫苗（口服）2/3",
+                type: "paid",
+                dose: "第2剂/共3剂",
+                prevent: "重度轮状病毒胃肠炎",
+                brand: "默沙东「乐儿德」五价口服",
+                price: "308元/剂",
+                priceNum: 308,
+                note: "与第1剂间隔4-10周。"
+            }
+        ]
+    },
+    // ===== 4月龄 =====
+    {
+        age: "4月龄",
+        monthOffset: 4,
+        vaccines: [
+            {
+                name: "13价肺炎球菌疫苗 2/4",
+                type: "paid",
+                dose: "第2剂/共4剂",
+                prevent: "肺炎球菌疾病",
+                brand: "辉瑞「沛儿13」/ 沃森生物",
+                price: "626元/剂",
+                priceNum: 626,
+                note: "与第1剂间隔≥4周。"
+            },
+            {
+                name: "五联疫苗 3/4",
+                type: "paid",
+                dose: "第3剂/共4剂",
+                prevent: "白喉、破伤风、百日咳、脊灰、Hib",
+                brand: "赛诺菲巴斯德「潘太欣」",
+                price: "624元/剂",
+                priceNum: 624,
+                note: "基础免疫第3剂。"
+            },
+            {
+                name: "五价轮状病毒疫苗（口服）3/3",
+                type: "paid",
+                dose: "第3剂/共3剂",
+                prevent: "重度轮状病毒胃肠炎",
+                brand: "默沙东「乐儿德」五价口服",
+                price: "308元/剂",
+                priceNum: 308,
+                note: "须在32周龄前完成全部3剂。五价轮状全程接种完毕。"
+            }
+        ]
+    },
+    // ===== 6月龄 =====
+    {
+        age: "6月龄",
+        monthOffset: 6,
+        vaccines: [
+            {
+                name: "乙肝疫苗 3/3",
+                type: "free",
+                dose: "第3剂/共3剂",
+                prevent: "乙型肝炎",
+                brand: "深圳康泰 / 大连汉信",
+                price: "免费",
+                priceNum: 0,
+                note: "完成乙肝基础免疫全程3针。与第1剂间隔≥6个月。"
+            },
+            {
+                name: "13价肺炎球菌疫苗 3/4",
+                type: "paid",
+                dose: "第3剂/共4剂",
+                prevent: "肺炎球菌疾病",
+                brand: "辉瑞「沛儿13」/ 沃森生物",
+                price: "626元/剂",
+                priceNum: 626,
+                note: "基础免疫第3剂，与第2剂间隔≥4周。"
+            },
+            {
+                name: "A群流脑多糖疫苗 1/2",
+                type: "free",
+                dose: "第1剂/共2剂",
+                prevent: "A群脑膜炎奈瑟菌引起的流行性脑脊髓膜炎",
+                brand: "武汉生物 / 兰州生物",
+                price: "免费",
+                priceNum: 0,
+                note: "免费一类疫苗。也可自费选择A+C结合流脑疫苗替代（186元/剂），保护更全面。"
+            },
+            {
+                name: "A+C结合流脑疫苗 1/2（替代方案）",
+                type: "paid",
+                dose: "第1剂/共2剂",
+                prevent: "A群和C群脑膜炎奈瑟菌",
+                brand: "罗益（武汉）/ 智飞生物",
+                price: "186元/剂",
+                priceNum: 186,
+                note: "自费替代免费A群流脑，可同时预防A群和C群，保护范围更广。与免费A群流脑二选一。"
+            },
+            {
+                name: "手足口病疫苗EV71 1/2",
+                type: "paid",
+                dose: "第1剂/共2剂",
+                prevent: "EV71型手足口病（重症手足口主要病因）",
+                brand: "科兴生物 / 武汉生物",
+                price: "223元/剂",
+                priceNum: 223,
+                note: "推荐6月龄-5岁接种。EV71是引起重症手足口的主要病原，接种可显著降低重症和死亡风险。2剂间隔≥1个月。"
+            }
+        ]
+    },
+    // ===== 7月龄 =====
+    {
+        age: "7月龄",
+        monthOffset: 7,
+        vaccines: [
+            {
+                name: "手足口病疫苗EV71 2/2",
+                type: "paid",
+                dose: "第2剂/共2剂",
+                prevent: "EV71型手足口病",
+                brand: "科兴生物 / 武汉生物",
+                price: "223元/剂",
+                priceNum: 223,
+                note: "与第1剂间隔≥1个月。手足口疫苗全程接种完毕。"
+            },
+            {
+                name: "A+C结合流脑疫苗 2/2",
+                type: "paid",
+                dose: "第2剂/共2剂",
+                prevent: "A群和C群脑膜炎奈瑟菌",
+                brand: "罗益（武汉）/ 智飞生物",
+                price: "186元/剂",
+                priceNum: 186,
+                note: "与第1剂间隔≥1个月。如6月龄选择了免费A群流脑，则此剂不需要。"
+            }
+        ]
+    },
+    // ===== 8月龄 =====
+    {
+        age: "8月龄",
+        monthOffset: 8,
+        vaccines: [
+            {
+                name: "麻腮风疫苗MMR 1/2",
+                type: "free",
+                dose: "第1剂/共2剂",
+                prevent: "麻疹、腮腺炎、风疹",
+                brand: "上海生物 / 北京科兴",
+                price: "免费",
+                priceNum: 0,
+                note: "务必在满8月龄后一周内尽快完成接种！8月龄首剂，18月龄加强第2剂。"
+            },
+            {
+                name: "乙脑减毒活疫苗 1/2",
+                type: "free",
+                dose: "第1剂/共2剂",
+                prevent: "流行性乙型脑炎",
+                brand: "成都生物 / 武汉生物",
+                price: "免费",
+                priceNum: 0,
+                note: "看宝宝身体情况，情况好打免费的减毒。减毒反应大但只需2针，灭活4针安全性高。"
+            },
+            {
+                name: "乙脑灭活疫苗（替代方案）",
+                type: "paid",
+                dose: "共4剂",
+                prevent: "流行性乙型脑炎",
+                brand: "北京科兴 / 辽宁成大",
+                price: "244元/剂",
+                priceNum: 244,
+                note: "看宝宝身体情况，情况好打免费的减毒。减毒反应大2针，灭活4针安全性高。灭活与免费减毒二选一。"
+            }
+        ]
+    },
+    // ===== 9月龄 =====
+    {
+        age: "9月龄",
+        monthOffset: 9,
+        vaccines: [
+            {
+                name: "A群流脑多糖疫苗 2/2",
+                type: "free",
+                dose: "第2剂/共2剂",
+                prevent: "流行性脑脊髓膜炎",
+                brand: "武汉生物 / 兰州生物",
+                price: "免费",
+                priceNum: 0,
+                note: "与第1剂间隔≥3个月。如6月龄已选A+C结合流脑方案，则此剂不需要。"
+            }
+        ]
+    },
+    // ===== 12-15月龄 =====
+    {
+        age: "12-15月龄",
+        monthOffset: 12,
+        vaccines: [
+            {
+                name: "13价肺炎球菌疫苗 4/4（加强针）",
+                type: "paid",
+                dose: "第4剂（加强针）",
+                prevent: "肺炎球菌疾病",
+                brand: "辉瑞「沛儿13」/ 沃森生物",
+                price: "626元/剂",
+                priceNum: 626,
+                note: "12-15月龄加强，与第3剂间隔≥2个月。完成13价肺炎全程4剂接种。"
+            },
+            {
+                name: "水痘疫苗（祈健）1/2",
+                type: "paid",
+                dose: "第1剂/共2剂",
+                prevent: "水痘",
+                brand: "祈健（推荐）",
+                price: "137元/剂",
+                priceNum: 137,
+                note: "强烈推荐！水痘传染性极强。15月龄第1剂，3岁第2剂。部分地区已纳入免费。"
+            }
+        ]
+    },
+    // ===== 1.5-2周岁 =====
+    {
+        age: "1.5-2周岁",
+        monthOffset: 18,
+        vaccines: [
+            {
+                name: "五联疫苗 4/4（加强针）",
+                type: "paid",
+                dose: "第4剂（加强针）",
+                prevent: "白喉、破伤风、百日咳、脊灰、Hib",
+                brand: "赛诺菲巴斯德「潘太欣」",
+                price: "624元/剂",
+                priceNum: 624,
+                note: "第四针加强针，完成五联全程4剂接种。"
+            },
+            {
+                name: "麻腮风疫苗MMR 2/2",
+                type: "free",
+                dose: "第2剂/共2剂",
+                prevent: "麻疹、腮腺炎、风疹",
+                brand: "上海生物 / 北京科兴",
+                price: "免费",
+                priceNum: 0,
+                note: "加强免疫，完成麻腮风全程2剂。"
+            },
+            {
+                name: "甲肝灭活疫苗 1/2",
+                type: "free",
+                dose: "第1剂/共2剂",
+                prevent: "甲型肝炎",
+                brand: "北京科兴 / 默沙东",
+                price: "免费",
+                priceNum: 0,
+                note: "灭活疫苗共2剂（18月龄+24月龄），保护更持久。"
+            },
+            {
+                name: "国产一价轮状病毒疫苗 1/2",
+                type: "paid",
+                dose: "第1剂/共2剂",
+                prevent: "轮状病毒腹泻",
+                brand: "兰州生物",
+                price: "待定",
+                priceNum: 0,
+                note: "1.5周岁后开始接种。五价轮状已完成3剂，此为国产一价轮状加强保护。"
+            }
+        ]
+    },
+    // ===== 2周岁 =====
+    {
+        age: "2周岁",
+        monthOffset: 24,
+        vaccines: [
+            {
+                name: "乙脑减毒活疫苗 2/2",
+                type: "free",
+                dose: "第2剂/共2剂",
+                prevent: "流行性乙型脑炎",
+                brand: "成都生物 / 武汉生物",
+                price: "免费",
+                priceNum: 0,
+                note: "看宝宝身体情况，情况好打免费的减毒。减毒反应大2针，灭活4针安全性高。与第1剂间隔≥1年。"
+            },
+            {
+                name: "乙脑灭活疫苗（替代方案）",
+                type: "paid",
+                dose: "共4剂",
+                prevent: "流行性乙型脑炎",
+                brand: "北京科兴 / 辽宁成大",
+                price: "244元/剂",
+                priceNum: 244,
+                note: "如8月龄选择了灭活方案，需按程序继续接种。灭活与免费减毒二选一。"
+            },
+            {
+                name: "甲肝灭活疫苗 2/2",
+                type: "free",
+                dose: "第2剂/共2剂",
+                prevent: "甲型肝炎",
+                brand: "北京科兴 / 默沙东",
+                price: "免费",
+                priceNum: 0,
+                note: "完成甲肝灭活全程2剂。与第1剂间隔≥6个月。"
+            },
+            {
+                name: "霍乱疫苗",
+                type: "paid",
+                dose: "视情况",
+                prevent: "霍乱",
+                brand: "-",
+                price: "123元",
+                priceNum: 123,
+                note: "暂时不打，视情况决定。"
+            },
+            {
+                name: "国产一价轮状病毒疫苗 2/2",
+                type: "paid",
+                dose: "第2剂/共2剂",
+                prevent: "轮状病毒腹泻",
+                brand: "兰州生物",
+                price: "待定",
+                priceNum: 0,
+                note: "须在3周岁前完成接种。"
+            }
+        ]
+    },
+    // ===== 3周岁 =====
+    {
+        age: "3周岁",
+        monthOffset: 36,
+        vaccines: [
+            {
+                name: "A+C群流脑多糖疫苗 1/2",
+                type: "free",
+                dose: "第1剂/共2剂",
+                prevent: "A群和C群脑膜炎奈瑟菌",
+                brand: "武汉生物 / 兰州生物",
+                price: "免费",
+                priceNum: 0,
+                note: "3岁和6岁各1剂。也可自费选择ACYW135四价流脑疫苗，保护更全面。"
+            },
+            {
+                name: "水痘疫苗（祈健）2/2",
+                type: "paid",
+                dose: "第2剂/共2剂",
+                prevent: "水痘",
+                brand: "祈健（推荐）",
+                price: "137元/剂",
+                priceNum: 137,
+                note: "加强免疫，完成水痘全程2剂接种。"
+            }
+        ]
+    },
+    // ===== 6周岁 =====
+    {
+        age: "6周岁",
+        monthOffset: 72,
+        vaccines: [
+            {
+                name: "白破疫苗（加强）",
+                type: "free",
+                dose: "1剂",
+                prevent: "白喉、破伤风",
+                brand: "武汉生物 / 长春生物",
+                price: "免费",
+                priceNum: 0,
+                note: "入学前加强免疫。"
+            },
+            {
+                name: "A+C群流脑多糖疫苗 2/2",
+                type: "free",
+                dose: "第2剂/共2剂",
+                prevent: "流行性脑脊髓膜炎",
+                brand: "武汉生物 / 兰州生物",
+                price: "免费",
+                priceNum: 0,
+                note: "与第1剂间隔≥3年。"
+            }
+        ]
+    }
+];
+
+// 家庭成员疫苗
+const familyVaccines = [
+    { name: "乙肝疫苗", age: "16周岁以下", price: "113元", note: "" },
+    { name: "60ug乙肝疫苗", age: "16周岁以上", price: "348元", note: "" },
+    { name: "戊肝疫苗", age: "适龄人群", price: "798元", note: "共3针" },
+    { name: "国产双价HPV疫苗", age: "9-45周岁", price: "357元/剂", note: "" },
+    { name: "进口九价HPV疫苗", age: "9-45周岁", price: "1000+元/剂", note: "" },
+    { name: "国产带状疱疹减毒活疫苗", age: "40周岁及以上", price: "1397元", note: "老年人，可预防老年痴呆" },
+    { name: "进口重组带状疱疹疫苗", age: "50周岁及以上", price: "1626元/剂", note: "老年人，可预防老年痴呆。共2针，杭州社区活动打1送1" },
+    { name: "23价肺炎球菌多糖疫苗", age: "老年人", price: "276元", note: "老年人推荐接种" }
+];
+
+// 渲染家庭成员疫苗
+function renderFamily() {
+    const container = document.getElementById('familyList');
+    container.innerHTML = familyVaccines.map(v => `
+        <div class="family-card">
+            <div class="fc-top">
+                <span class="fc-name">${v.name}</span>
+                <div>
+                    <span class="fc-age">${v.age}</span>
+                    <span class="fc-price" style="margin-left:12px;">${v.price}</span>
+                </div>
+            </div>
+            ${v.note ? `<div class="fc-note">${v.note}</div>` : ''}
+        </div>
+    `).join('');
+}
+
+function getVaccineDate(monthOffset) {
+    const d = new Date(BIRTH_DATE);
+    d.setMonth(d.getMonth() + monthOffset);
+    return d;
+}
+
+function formatDate(date) {
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+}
+
+function getAgeStatus(monthOffset) {
+    const today = new Date();
+    const vaccineDate = getVaccineDate(monthOffset);
+    const diffMs = vaccineDate - today;
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays < -30) return { status: 'past', text: '已到期', class: 'status-done' };
+    if (diffDays <= 30 && diffDays >= -30) return { status: 'current', text: '当前阶段', class: 'status-current' };
+    return { status: 'upcoming', text: `约${diffDays}天后`, class: 'status-upcoming' };
+}
+
+function getStorageKey(ageGroup, vaccineName) {
+    return `vaccine_${ageGroup}_${vaccineName}`;
+}
+
+function isChecked(ageGroup, vaccineName) {
+    return localStorage.getItem(getStorageKey(ageGroup, vaccineName)) === 'true';
+}
+
+function toggleCheck(ageGroup, vaccineName) {
+    const key = getStorageKey(ageGroup, vaccineName);
+    const current = localStorage.getItem(key) === 'true';
+    localStorage.setItem(key, !current);
+    render();
+}
+
+let currentFilter = 'all';
+
+function filterVaccines(filter) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'active-free', 'active-paid');
+    });
+    event.target.classList.add(filter === 'free' ? 'active-free' : filter === 'paid' ? 'active-paid' : 'active');
+    render();
+}
+
+function render() {
+    const container = document.getElementById('vaccineList');
+    container.innerHTML = '';
+
+    let totalVaccines = 0;
+    let checkedVaccines = 0;
+    let nextVaccineDate = null;
+    let totalCost = 0;
+    let paidCost = 0;
+
+    vaccineData.forEach(group => {
+        const vaccineDate = getVaccineDate(group.monthOffset);
+        const status = getAgeStatus(group.monthOffset);
+
+        let filteredVaccines = group.vaccines;
+        if (currentFilter === 'free') {
+            filteredVaccines = group.vaccines.filter(v => v.type === 'free');
+        } else if (currentFilter === 'paid') {
+            filteredVaccines = group.vaccines.filter(v => v.type === 'paid');
+        } else if (currentFilter === 'unchecked') {
+            filteredVaccines = group.vaccines.filter(v => !isChecked(group.age, v.name));
+        }
+
+        // Count all
+        group.vaccines.forEach(v => {
+            totalVaccines++;
+            if (v.priceNum > 0) totalCost += v.priceNum;
+            if (isChecked(group.age, v.name)) {
+                checkedVaccines++;
+                if (v.priceNum > 0) paidCost += v.priceNum;
+            }
+        });
+
+        // Next vaccine
+        const today = new Date();
+        if (vaccineDate >= today && !nextVaccineDate) {
+            const hasUnchecked = group.vaccines.some(v => !isChecked(group.age, v.name));
+            if (hasUnchecked) nextVaccineDate = vaccineDate;
+        }
+
+        if (filteredVaccines.length === 0) return;
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'age-group';
+        groupDiv.innerHTML = `
+            <div class="age-group-header">
+                <span class="age-badge">${group.age}</span>
+                <span class="age-date">${formatDate(vaccineDate)}</span>
+                <span class="age-status ${status.class}">${status.text}</span>
+            </div>
+        `;
+
+        filteredVaccines.forEach(vaccine => {
+            const checked = isChecked(group.age, vaccine.name);
+            const cardId = `card_${group.age}_${vaccine.name}`.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '_');
+
+            const card = document.createElement('div');
+            card.className = `vaccine-card ${vaccine.type} ${checked ? 'checked' : ''}`;
+            card.innerHTML = `
+                <div class="vaccine-top">
+                    <div class="vaccine-checkbox ${checked ? 'checked' : ''}"
+                         onclick="event.stopPropagation(); toggleCheck('${group.age}', '${vaccine.name.replace(/'/g, "\\'")}')">
+                    </div>
+                    <div class="vaccine-info">
+                        <div class="vaccine-name">${vaccine.name}</div>
+                        <div class="vaccine-desc">预防：${vaccine.prevent}</div>
+                        <div class="vaccine-tags">
+                            <span class="tag ${vaccine.type === 'free' ? 'tag-free' : 'tag-paid'}">
+                                ${vaccine.type === 'free' ? '免费' : '自费'}
+                            </span>
+                            <span class="tag tag-dose">${vaccine.dose}</span>
+                            ${vaccine.priceNum > 0 ? `<span class="tag tag-price">${vaccine.price}</span>` : ''}
+                            <span class="tag tag-brand">${vaccine.brand}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="vaccine-detail" id="${cardId}">
+                    <div class="detail-row"><span class="detail-label">预防疾病</span><span>${vaccine.prevent}</span></div>
+                    <div class="detail-row"><span class="detail-label">剂次</span><span>${vaccine.dose}</span></div>
+                    <div class="detail-row"><span class="detail-label">推荐品牌</span><span>${vaccine.brand}</span></div>
+                    <div class="detail-row"><span class="detail-label">价格</span><span>${vaccine.price}</span></div>
+                    <div class="detail-row"><span class="detail-label">备注</span><span>${vaccine.note}</span></div>
+                </div>
+            `;
+            card.onclick = () => {
+                const detail = document.getElementById(cardId);
+                detail.classList.toggle('show');
+            };
+            groupDiv.appendChild(card);
+        });
+
+        container.appendChild(groupDiv);
+    });
+
+    document.getElementById('totalCount').textContent = totalVaccines;
+    document.getElementById('doneCount').textContent = checkedVaccines;
+
+    const percent = totalVaccines > 0 ? Math.round(checkedVaccines / totalVaccines * 100) : 0;
+    document.getElementById('progressPercent').textContent = percent + '%';
+    document.getElementById('progressBar').style.width = percent + '%';
+
+    document.getElementById('totalCost').textContent = '¥' + totalCost;
+    document.getElementById('paidCost').textContent = '¥' + paidCost;
+
+    if (nextVaccineDate) {
+        const diffDays = Math.ceil((nextVaccineDate - new Date()) / (1000 * 60 * 60 * 24));
+        document.getElementById('nextDays').textContent = diffDays > 0 ? diffDays + '天' : '今天';
+    } else {
+        document.getElementById('nextDays').textContent = '已完成';
+    }
+}
+
+render();
+renderFamily();
+</script>
+</body>
+</html>
