@@ -7,333 +7,674 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --primary: #4F46E5;
-            --primary-light: #818CF8;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --bg: #F8FAFC;
-            --text: #1E293B;
-            --text-secondary: #64748B;
-            --border: #E2E8F0;
-            --free-bg: #ECFDF5;
-            --free-border: #6EE7B7;
-            --paid-bg: #FFF7ED;
-            --paid-border: #FDBA74;
+            /* Airbnb Color Palette */
+            --rausch: #ff385c;
+            --rausch-deep: #e00b41;
+            --text-primary: #222222;
+            --text-focused: #3f3f3f;
+            --text-secondary: #6a6a6a;
+            --text-disabled: rgba(0,0,0,0.24);
+            --bg-white: #ffffff;
+            --bg-surface: #f7f7f7;
+            --border-gray: #dddddd;
+            --border-light: #ebebeb;
+            --nav-surface: #f2f2f2;
+            --success: #008a05;
+            --success-bg: #f0faf0;
+            --warning: #c87d2f;
+            --warning-bg: #fef7ed;
+            --error: #c13515;
+            /* Airbnb Shadows */
+            --shadow-card: rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px;
+            --shadow-hover: rgba(0,0,0,0.08) 0px 4px 12px;
+            --shadow-subtle: rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 4px;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-            background: var(--bg); color: var(--text); line-height: 1.6;
+            font-family: Circular, -apple-system, system-ui, Roboto, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            line-height: 1.43;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ===== 欢迎页 ===== */
         .welcome-page {
             min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
-            padding: 20px;
+            background: var(--bg-white);
+            padding: 24px;
         }
         .welcome-card {
-            background: white; border-radius: 24px; padding: 50px 40px;
-            max-width: 460px; width: 100%; text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            animation: slideUp 0.6s ease;
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 48px 40px;
+            max-width: 440px; width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+            animation: slideUp 0.5s ease;
         }
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .welcome-card .icon { font-size: 4em; margin-bottom: 10px; }
-        .welcome-card h1 { font-size: 1.8em; color: var(--text); margin-bottom: 6px; }
-        .welcome-card p { color: var(--text-secondary); margin-bottom: 30px; }
-        .form-group { margin-bottom: 20px; text-align: left; }
+        .welcome-card .icon { font-size: 3.5em; margin-bottom: 16px; }
+        .welcome-card h1 {
+            font-size: 28px; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 8px; line-height: 1.43; letter-spacing: normal;
+        }
+        .welcome-card p {
+            color: var(--text-secondary); margin-bottom: 32px;
+            font-size: 16px; font-weight: 400; line-height: 1.43;
+        }
+        .form-group { margin-bottom: 24px; text-align: left; }
         .form-group label {
-            display: block; font-weight: 600; margin-bottom: 6px;
-            font-size: 0.95em; color: var(--text);
+            display: block; font-weight: 600; margin-bottom: 8px;
+            font-size: 14px; color: var(--text-primary);
         }
         .form-group input {
-            width: 100%; padding: 12px 16px; border: 2px solid var(--border);
-            border-radius: 12px; font-size: 1em; transition: border-color 0.2s;
-            outline: none;
+            width: 100%; padding: 14px 16px;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px; font-size: 16px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none; color: var(--text-primary);
+            font-family: inherit;
         }
-        .form-group input:focus { border-color: var(--primary); }
+        .form-group input:focus {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--text-primary);
+        }
         .btn-start {
-            width: 100%; padding: 14px; background: linear-gradient(135deg, #4F46E5, #7C3AED);
-            color: white; border: none; border-radius: 12px; font-size: 1.1em;
-            font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%; padding: 14px;
+            background: var(--text-primary);
+            color: var(--bg-white); border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 500; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: inherit; line-height: 1.25;
         }
-        .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,70,229,0.4); }
-        .btn-start:active { transform: translateY(0); }
+        .btn-start:hover { background: var(--rausch); }
+        .btn-start:active { transform: scale(0.97); }
 
         /* ===== 主页面 ===== */
         .main-page { display: none; }
         .header {
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
-            color: white; padding: 30px 20px; text-align: center;
-            position: relative; overflow: hidden;
+            background: var(--bg-white);
+            color: var(--text-primary);
+            padding: 32px 24px 28px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid var(--border-light);
         }
-        .header::before {
-            content: ''; position: absolute; top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            animation: float 6s ease-in-out infinite;
+        .header h1 {
+            font-size: 28px; font-weight: 700; margin-bottom: 4px;
+            line-height: 1.43; color: var(--text-primary);
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
+        .header .baby-icon {
+            font-size: 2.2em; margin-bottom: 8px; display: block;
         }
-        .header h1 { font-size: 1.8em; margin-bottom: 4px; position: relative; }
-        .header .baby-icon { font-size: 2.5em; margin-bottom: 8px; display: block; }
-        .header p { opacity: 0.9; font-size: 1em; position: relative; }
+        .header p {
+            color: var(--text-secondary); font-size: 14px;
+            font-weight: 400;
+        }
         .header .edit-btn {
-            position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3); color: white; padding: 4px 12px;
-            border-radius: 8px; cursor: pointer; font-size: 0.8em; z-index: 1;
+            position: absolute; top: 16px; right: 16px;
+            background: var(--nav-surface);
+            border: none; color: var(--text-primary);
+            padding: 8px 16px; border-radius: 50px;
+            cursor: pointer; font-size: 13px; font-weight: 500;
+            transition: background 0.2s, box-shadow 0.2s;
+            font-family: inherit;
         }
-        .header .edit-btn:hover { background: rgba(255,255,255,0.3); }
+        .header .edit-btn:hover {
+            background: var(--border-light);
+            box-shadow: var(--shadow-hover);
+        }
         .stats-bar {
-            display: flex; justify-content: center; gap: 30px;
-            margin-top: 15px; position: relative; flex-wrap: wrap;
+            display: flex; justify-content: center; gap: 40px;
+            margin-top: 20px; flex-wrap: wrap;
         }
         .stat-item { text-align: center; }
-        .stat-item .num { font-size: 1.6em; font-weight: 700; }
-        .stat-item .label { font-size: 0.8em; opacity: 0.8; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .stat-item .num {
+            font-size: 28px; font-weight: 700; color: var(--text-primary);
+            line-height: 1.18; letter-spacing: -0.44px;
+        }
+        .stat-item .label {
+            font-size: 13px; color: var(--text-secondary);
+            font-weight: 400; margin-top: 4px;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 24px; }
 
-        /* ===== 日历下载栏 ===== */
+        /* ===== 日历订阅栏 ===== */
         .calendar-bar {
-            background: linear-gradient(135deg, #F0FDF4, #ECFDF5);
-            border: 2px solid #86EFAC; border-radius: 16px;
-            padding: 16px 20px; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            background: var(--bg-white);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+            box-shadow: var(--shadow-card);
+            position: sticky; top: 0; z-index: 100;
+            transition: border-radius 0.3s, box-shadow 0.3s, padding 0.3s;
         }
-        .calendar-bar .cal-icon { font-size: 1.6em; }
+        .calendar-bar.stuck {
+            border-radius: 0 0 14px 14px;
+            padding: 14px 24px;
+            box-shadow: rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.12) 0px 4px 12px;
+        }
+        .calendar-bar .cal-icon { font-size: 1.8em; }
         .calendar-bar .cal-text { flex: 1; }
-        .calendar-bar .cal-text h3 { font-size: 0.95em; color: #065F46; }
-        .calendar-bar .cal-text p { font-size: 0.82em; color: #047857; }
-        .btn-calendar {
-            padding: 10px 20px; background: linear-gradient(135deg, #059669, #10B981);
-            color: white; border: none; border-radius: 10px; font-size: 0.9em;
-            font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+        .calendar-bar .cal-text h3 {
+            font-size: 16px; font-weight: 600; color: var(--text-primary);
+            line-height: 1.25;
         }
-        .btn-calendar:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(5,150,105,0.3); }
+        .calendar-bar .cal-text p {
+            font-size: 14px; color: var(--text-secondary);
+            font-weight: 400; margin-top: 2px;
+        }
+        .btn-calendar {
+            padding: 12px 24px;
+            background: var(--rausch);
+            color: var(--bg-white); border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap; font-family: inherit;
+        }
+        .btn-calendar:hover { background: var(--rausch-deep); }
+        .btn-calendar:active { transform: scale(0.97); }
 
         /* ===== 日历弹窗 ===== */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5); z-index: 1000;
-            align-items: center; justify-content: center; padding: 20px;
+            align-items: center; justify-content: center; padding: 24px;
         }
         .modal-overlay.show { display: flex; }
         .modal {
-            background: white; border-radius: 20px; max-width: 520px; width: 100%;
-            max-height: 85vh; overflow-y: auto; animation: slideUp 0.3s ease;
+            background: var(--bg-white); border-radius: 20px;
+            max-width: 520px; width: 100%;
+            max-height: 85vh; overflow-y: auto;
+            animation: slideUp 0.3s ease;
+            box-shadow: var(--shadow-card);
         }
         .modal-header {
-            padding: 20px 24px; border-bottom: 1px solid var(--border);
+            padding: 20px 24px; border-bottom: 1px solid var(--border-light);
             display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; background: white; border-radius: 20px 20px 0 0;
-            z-index: 1;
+            position: sticky; top: 0; background: var(--bg-white);
+            border-radius: 20px 20px 0 0; z-index: 1;
         }
-        .modal-header h2 { font-size: 1.1em; }
+        .modal-header h2 {
+            font-size: 18px; font-weight: 600; color: var(--text-primary);
+            letter-spacing: -0.18px;
+        }
         .modal-close {
-            width: 32px; height: 32px; border-radius: 8px; border: none;
-            background: #F1F5F9; cursor: pointer; font-size: 1.2em;
+            width: 32px; height: 32px; border-radius: 50%;
+            border: none; background: var(--nav-surface);
+            cursor: pointer; font-size: 16px;
             display: flex; align-items: center; justify-content: center;
+            color: var(--text-primary); transition: background 0.2s;
+            font-family: inherit;
         }
-        .modal-close:hover { background: #E2E8F0; }
-        .modal-body { padding: 20px 24px; }
+        .modal-close:hover { background: var(--border-light); }
+        .modal-body { padding: 24px; }
         .modal-footer {
-            padding: 16px 24px; border-top: 1px solid var(--border);
-            display: flex; gap: 10px; justify-content: flex-end;
-            position: sticky; bottom: 0; background: white; border-radius: 0 0 20px 20px;
+            padding: 20px 24px; border-top: 1px solid var(--border-light);
+            display: flex; gap: 12px; justify-content: flex-end;
+            position: sticky; bottom: 0; background: var(--bg-white);
+            border-radius: 0 0 20px 20px;
         }
 
-        .reminder-section { margin-bottom: 20px; }
-        .reminder-section h3 { font-size: 0.95em; margin-bottom: 10px; color: var(--text); }
+        .reminder-section { margin-bottom: 24px; }
+        .reminder-section h3 {
+            font-size: 16px; font-weight: 600; margin-bottom: 8px;
+            color: var(--text-primary);
+        }
         .reminder-options { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .reminder-opt {
-            padding: 8px 16px; border: 2px solid var(--border); border-radius: 10px;
-            background: white; cursor: pointer; font-size: 0.88em; transition: all 0.2s;
+            padding: 10px 18px; border: 1px solid var(--border-gray);
+            border-radius: 50px; background: var(--bg-white);
+            cursor: pointer; font-size: 14px; font-weight: 500;
+            transition: all 0.2s; color: var(--text-primary);
+            font-family: inherit;
         }
-        .reminder-opt:hover { border-color: var(--primary); color: var(--primary); }
-        .reminder-opt.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .reminder-opt:hover {
+            border-color: var(--text-primary);
+        }
+        .reminder-opt.active {
+            background: var(--text-primary); color: var(--bg-white);
+            border-color: var(--text-primary);
+        }
         .custom-reminder {
             display: none; margin-top: 8px;
             align-items: center; gap: 8px;
         }
         .custom-reminder.show { display: flex; }
         .custom-reminder input {
-            width: 80px; padding: 8px 12px; border: 2px solid var(--border);
-            border-radius: 8px; font-size: 0.9em; text-align: center; outline: none;
+            width: 80px; padding: 10px 12px;
+            border: 1px solid var(--border-gray);
+            border-radius: 8px; font-size: 14px;
+            text-align: center; outline: none;
+            font-family: inherit; color: var(--text-primary);
         }
-        .custom-reminder input:focus { border-color: var(--primary); }
-        .custom-reminder span { font-size: 0.9em; color: var(--text-secondary); }
+        .custom-reminder input:focus {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 2px var(--text-primary);
+        }
+        .custom-reminder span {
+            font-size: 14px; color: var(--text-secondary);
+        }
 
-        .scope-section { margin-bottom: 16px; }
-        .scope-section h3 { font-size: 0.95em; margin-bottom: 10px; }
+        .scope-section { margin-bottom: 24px; }
+        .scope-section h3 {
+            font-size: 16px; font-weight: 600; margin-bottom: 10px;
+        }
         .scope-options { display: flex; gap: 8px; flex-wrap: wrap; }
         .scope-opt {
-            padding: 8px 16px; border: 2px solid var(--border); border-radius: 10px;
-            background: white; cursor: pointer; font-size: 0.88em; transition: all 0.2s;
+            padding: 10px 18px; border: 1px solid var(--border-gray);
+            border-radius: 50px; background: var(--bg-white);
+            cursor: pointer; font-size: 14px; font-weight: 500;
+            transition: all 0.2s; color: var(--text-primary);
+            font-family: inherit;
         }
-        .scope-opt:hover { border-color: var(--primary); }
-        .scope-opt.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .scope-opt:hover { border-color: var(--text-primary); }
+        .scope-opt.active {
+            background: var(--text-primary); color: var(--bg-white);
+            border-color: var(--text-primary);
+        }
 
-        .preview-list { margin-top: 16px; }
-        .preview-list h3 { font-size: 0.95em; margin-bottom: 8px; }
+        .preview-list { margin-top: 20px; }
+        .preview-list h3 {
+            font-size: 16px; font-weight: 600; margin-bottom: 10px;
+        }
         .preview-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 12px; border-radius: 8px; margin-bottom: 4px;
-            font-size: 0.85em; background: #F8FAFC;
+            padding: 10px 14px; border-radius: 8px; margin-bottom: 4px;
+            font-size: 14px; background: var(--bg-surface);
         }
-        .preview-item .pi-name { font-weight: 500; }
-        .preview-item .pi-date { color: var(--text-secondary); }
+        .preview-item .pi-name { font-weight: 500; color: var(--text-primary); }
+        .preview-item .pi-date { color: var(--text-secondary); font-size: 13px; }
         .preview-count {
-            text-align: center; padding: 10px; background: #EFF6FF;
-            border-radius: 10px; margin-top: 12px; font-size: 0.9em; color: #1D4ED8;
+            text-align: center; padding: 12px;
+            background: var(--bg-surface);
+            border-radius: 14px; margin-top: 12px;
+            font-size: 14px; color: var(--text-secondary); font-weight: 500;
         }
 
         .btn-download {
-            padding: 10px 24px; background: linear-gradient(135deg, #059669, #10B981);
-            color: white; border: none; border-radius: 10px; font-size: 0.95em;
-            font-weight: 600; cursor: pointer; transition: all 0.2s;
+            padding: 12px 24px;
+            background: var(--rausch);
+            color: var(--bg-white); border: none; border-radius: 8px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: inherit;
         }
-        .btn-download:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(5,150,105,0.3); }
+        .btn-download:hover { background: var(--rausch-deep); }
+        .btn-download:active { transform: scale(0.97); }
         .btn-cancel {
-            padding: 10px 20px; background: #F1F5F9; color: var(--text);
-            border: none; border-radius: 10px; font-size: 0.95em; cursor: pointer;
+            padding: 12px 20px;
+            background: var(--nav-surface); color: var(--text-primary);
+            border: none; border-radius: 8px; font-size: 14px;
+            font-weight: 500; cursor: pointer; font-family: inherit;
+            transition: background 0.2s;
         }
-        .btn-cancel:hover { background: #E2E8F0; }
+        .btn-cancel:hover { background: var(--border-light); }
 
         /* ===== 筛选和卡片 ===== */
         .filter-bar {
-            display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; align-items: center;
+            display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
         }
         .filter-btn {
-            padding: 8px 20px; border: 2px solid var(--border); border-radius: 25px;
-            background: white; cursor: pointer; font-size: 0.9em; transition: all 0.2s; font-weight: 500;
+            padding: 10px 20px; border: 1px solid var(--border-gray);
+            border-radius: 50px; background: var(--bg-white);
+            cursor: pointer; font-size: 14px; font-weight: 500;
+            transition: all 0.2s; color: var(--text-primary);
+            font-family: inherit;
         }
-        .filter-btn:hover { border-color: var(--primary); color: var(--primary); }
-        .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .filter-btn.active-free { background: var(--success); color: white; border-color: var(--success); }
-        .filter-btn.active-paid { background: #F59E0B; color: white; border-color: #F59E0B; }
+        .filter-btn:hover { border-color: var(--text-primary); }
+        .filter-btn.active {
+            background: var(--text-primary); color: var(--bg-white);
+            border-color: var(--text-primary);
+        }
+        .filter-btn.active-free {
+            background: var(--success); color: var(--bg-white);
+            border-color: var(--success);
+        }
+        .filter-btn.active-paid {
+            background: var(--warning); color: var(--bg-white);
+            border-color: var(--warning);
+        }
+
         .progress-section {
-            background: white; border-radius: 16px; padding: 20px;
-            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            background: var(--bg-white); border-radius: 20px; padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow-subtle);
         }
         .progress-bar-container {
-            background: #E2E8F0; border-radius: 10px; height: 12px;
-            overflow: hidden; margin-top: 10px;
+            background: var(--border-light); border-radius: 50px;
+            height: 8px; overflow: hidden; margin-top: 12px;
         }
         .progress-bar {
-            height: 100%; border-radius: 10px;
-            background: linear-gradient(90deg, #10B981, #34D399); transition: width 0.5s ease;
+            height: 100%; border-radius: 50px;
+            background: var(--rausch);
+            transition: width 0.5s ease;
         }
         .progress-text {
-            display: flex; justify-content: space-between; font-size: 0.9em; color: var(--text-secondary);
+            display: flex; justify-content: space-between;
+            font-size: 14px; color: var(--text-secondary); font-weight: 500;
         }
+
         .cost-section {
-            background: white; border-radius: 16px; padding: 20px;
-            margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            background: var(--bg-white); border-radius: 20px; padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-subtle);
         }
         .cost-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 6px 0; font-size: 0.95em;
+            padding: 6px 0; font-size: 14px;
         }
-        .cost-row .cost-label { color: var(--text-secondary); }
-        .cost-row .cost-value { font-weight: 700; color: #DC2626; font-size: 1.1em; }
-        .age-group { margin-bottom: 30px; }
+        .cost-row .cost-label { color: var(--text-secondary); font-weight: 400; }
+        .cost-row .cost-value {
+            font-weight: 700; color: var(--rausch);
+            font-size: 20px; letter-spacing: -0.18px;
+        }
+
+        .age-group { margin-bottom: 32px; }
         .age-group-header {
             display: flex; align-items: center; gap: 12px;
-            margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--border);
+            margin-bottom: 16px; padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
         }
         .age-badge {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white; padding: 6px 16px; border-radius: 20px;
-            font-weight: 600; font-size: 0.95em; white-space: nowrap;
+            background: var(--text-primary);
+            color: var(--bg-white);
+            padding: 6px 18px; border-radius: 50px;
+            font-weight: 600; font-size: 14px; white-space: nowrap;
         }
-        .age-date { color: var(--text-secondary); font-size: 0.9em; }
+        .age-date {
+            color: var(--text-secondary); font-size: 14px; font-weight: 400;
+        }
         .age-status {
-            margin-left: auto; font-size: 0.85em; padding: 4px 12px;
-            border-radius: 12px; font-weight: 500;
+            margin-left: auto; font-size: 12px; padding: 4px 14px;
+            border-radius: 14px; font-weight: 600;
         }
-        .status-done { background: #ECFDF5; color: #059669; }
-        .status-current { background: #EFF6FF; color: #2563EB; animation: pulse 2s infinite; }
+        .status-done { background: var(--success-bg); color: var(--success); }
+        .status-current {
+            background: #fff0f0; color: var(--rausch);
+            animation: pulse 2s infinite;
+        }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .status-upcoming { background: #F1F5F9; color: #64748B; }
+        .status-upcoming { background: var(--bg-surface); color: var(--text-secondary); }
+
         .vaccine-card {
-            background: white; border-radius: 12px; padding: 16px 20px;
-            margin-bottom: 10px; border-left: 4px solid var(--primary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: all 0.2s; cursor: pointer;
+            background: var(--bg-white); border-radius: 14px;
+            padding: 20px 24px; margin-bottom: 12px;
+            box-shadow: var(--shadow-subtle);
+            transition: box-shadow 0.2s, transform 0.2s; cursor: pointer;
+            border: none;
         }
-        .vaccine-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateX(4px); }
-        .vaccine-card.free { border-left-color: var(--success); }
-        .vaccine-card.paid { border-left-color: #F59E0B; }
-        .vaccine-card.checked { opacity: 0.6; background: #F8FAFC; }
+        .vaccine-card:hover {
+            box-shadow: var(--shadow-card);
+            transform: translateY(-1px);
+        }
+        .vaccine-card.free { }
+        .vaccine-card.paid { }
+        .vaccine-card.checked {
+            opacity: 0.55; background: var(--bg-surface);
+        }
         .vaccine-card.checked .vaccine-name { text-decoration: line-through; }
-        .vaccine-top { display: flex; align-items: flex-start; gap: 12px; }
+
+        .vaccine-top { display: flex; align-items: flex-start; gap: 14px; }
         .vaccine-checkbox {
-            width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border);
+            width: 24px; height: 24px; border-radius: 50%;
+            border: 2px solid var(--border-gray);
             cursor: pointer; display: flex; align-items: center; justify-content: center;
             flex-shrink: 0; margin-top: 2px; transition: all 0.2s;
         }
-        .vaccine-checkbox.checked { background: var(--success); border-color: var(--success); }
-        .vaccine-checkbox.checked::after { content: '\2713'; color: white; font-size: 14px; font-weight: 700; }
+        .vaccine-checkbox.checked {
+            background: var(--rausch); border-color: var(--rausch);
+        }
+        .vaccine-checkbox.checked::after {
+            content: '\2713'; color: var(--bg-white);
+            font-size: 13px; font-weight: 700;
+        }
         .vaccine-info { flex: 1; }
-        .vaccine-name { font-weight: 600; font-size: 1.05em; margin-bottom: 4px; }
-        .vaccine-desc { color: var(--text-secondary); font-size: 0.88em; margin-bottom: 6px; }
+        .vaccine-name {
+            font-weight: 600; font-size: 16px; margin-bottom: 4px;
+            color: var(--text-primary); line-height: 1.25;
+        }
+        .vaccine-desc {
+            color: var(--text-secondary); font-size: 14px;
+            margin-bottom: 8px; font-weight: 400;
+        }
         .vaccine-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-        .tag { padding: 2px 10px; border-radius: 12px; font-size: 0.78em; font-weight: 500; }
-        .tag-free { background: var(--free-bg); color: #059669; border: 1px solid var(--free-border); }
-        .tag-paid { background: var(--paid-bg); color: #D97706; border: 1px solid var(--paid-border); }
-        .tag-brand { background: #EFF6FF; color: #2563EB; border: 1px solid #93C5FD; }
-        .tag-price { background: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; }
-        .tag-dose { background: #F5F3FF; color: #7C3AED; border: 1px solid #C4B5FD; }
+        .tag {
+            padding: 4px 12px; border-radius: 14px;
+            font-size: 12px; font-weight: 600;
+        }
+        .tag-free {
+            background: var(--success-bg); color: var(--success);
+        }
+        .tag-paid {
+            background: var(--warning-bg); color: var(--warning);
+        }
+        .tag-brand {
+            background: var(--bg-surface); color: var(--text-secondary);
+        }
+        .tag-price {
+            background: #fff0f0; color: var(--rausch);
+        }
+        .tag-dose {
+            background: var(--bg-surface); color: var(--text-focused);
+        }
+
         .vaccine-detail {
-            display: none; margin-top: 12px; padding-top: 12px;
-            border-top: 1px dashed var(--border); font-size: 0.9em; color: var(--text-secondary);
+            display: none; margin-top: 16px; padding-top: 16px;
+            border-top: 1px solid var(--border-light);
+            font-size: 14px; color: var(--text-secondary);
         }
         .vaccine-detail.show { display: block; }
-        .detail-row { display: flex; margin-bottom: 6px; }
-        .detail-label { font-weight: 600; color: var(--text); min-width: 80px; }
-        .legend { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; font-size: 0.9em; }
-        .legend-item { display: flex; align-items: center; gap: 6px; }
-        .legend-dot { width: 14px; height: 14px; border-radius: 4px; }
-        .dot-free { background: var(--success); }
-        .dot-paid { background: #F59E0B; }
-        .tip-box {
-            background: linear-gradient(135deg, #EFF6FF, #F5F3FF);
-            border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; border: 1px solid #C7D2FE;
+        .detail-row {
+            display: flex; margin-bottom: 8px; line-height: 1.43;
         }
-        .tip-box h3 { color: var(--primary); font-size: 0.95em; margin-bottom: 6px; }
-        .tip-box p { font-size: 0.88em; color: var(--text-secondary); }
+        .detail-label {
+            font-weight: 600; color: var(--text-primary);
+            min-width: 80px; font-size: 14px;
+        }
+        .note-row { margin-bottom: 8px; }
+        .note-row .detail-label {
+            margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+        }
+        .note-edit-btn {
+            font-size: 12px; color: var(--rausch); cursor: pointer;
+            border: 1px solid var(--rausch);
+            background: var(--bg-white); border-radius: 50px;
+            padding: 2px 10px; transition: all 0.2s;
+            font-family: inherit; font-weight: 500;
+        }
+        .note-edit-btn:hover {
+            background: var(--rausch); color: var(--bg-white);
+        }
+        .note-text {
+            color: var(--text-secondary); line-height: 1.5;
+            font-size: 14px;
+        }
+        .note-textarea {
+            width: 100%; min-height: 60px; padding: 12px 14px;
+            border: 1px solid var(--text-primary);
+            border-radius: 8px; font-size: 14px;
+            font-family: inherit; resize: vertical;
+            outline: none; line-height: 1.5;
+            color: var(--text-primary);
+        }
+        .note-textarea:focus {
+            box-shadow: 0 0 0 2px var(--text-primary);
+        }
+        .note-actions { display: flex; gap: 8px; margin-top: 8px; }
+        .note-actions button {
+            padding: 6px 14px; border-radius: 8px;
+            font-size: 13px; cursor: pointer; border: none;
+            font-family: inherit; font-weight: 500;
+        }
+        .note-save { background: var(--text-primary); color: var(--bg-white); }
+        .note-save:hover { background: var(--rausch); }
+        .note-cancel {
+            background: var(--nav-surface); color: var(--text-primary);
+        }
+        .note-cancel:hover { background: var(--border-light); }
+        .note-reset {
+            background: transparent; color: var(--text-secondary);
+            font-size: 12px !important; text-decoration: underline;
+        }
+
+        .legend {
+            display: flex; gap: 24px; margin-bottom: 24px;
+            flex-wrap: wrap; font-size: 14px; font-weight: 500;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .dot-free { background: var(--success); }
+        .dot-paid { background: var(--warning); }
+
+        .tip-box {
+            background: var(--bg-surface);
+            border-radius: 14px; padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+        .tip-box h3 {
+            color: var(--text-primary); font-size: 16px;
+            font-weight: 600; margin-bottom: 8px;
+        }
+        .tip-box p {
+            font-size: 14px; color: var(--text-secondary);
+            line-height: 1.6; font-weight: 400;
+        }
+        .tip-box p b { color: var(--text-primary); font-weight: 600; }
+
         .section-title {
-            font-size: 1.2em; font-weight: 700; margin: 30px 0 15px;
-            padding-left: 12px; border-left: 4px solid var(--primary);
+            font-size: 22px; font-weight: 600; margin: 40px 0 16px;
+            color: var(--text-primary);
+            letter-spacing: -0.44px; line-height: 1.18;
         }
         .family-card {
-            background: white; border-radius: 12px; padding: 14px 20px;
-            margin-bottom: 8px; border-left: 4px solid #8B5CF6;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            background: var(--bg-white); border-radius: 14px;
+            padding: 18px 24px; margin-bottom: 10px;
+            box-shadow: var(--shadow-subtle);
+            transition: box-shadow 0.2s;
         }
-        .family-card .fc-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .family-card .fc-name { font-weight: 600; }
-        .family-card .fc-age { color: var(--text-secondary); font-size: 0.85em; }
-        .family-card .fc-price { color: #DC2626; font-weight: 600; }
-        .family-card .fc-note { color: var(--text-secondary); font-size: 0.85em; margin-top: 4px; }
+        .family-card:hover { box-shadow: var(--shadow-card); }
+        .family-card .fc-top {
+            display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; gap: 8px;
+        }
+        .family-card .fc-name {
+            font-weight: 600; font-size: 16px; color: var(--text-primary);
+        }
+        .family-card .fc-age {
+            color: var(--text-secondary); font-size: 13px; font-weight: 400;
+        }
+        .family-card .fc-price {
+            color: var(--rausch); font-weight: 600; font-size: 14px;
+        }
+        .family-card .fc-note {
+            color: var(--text-secondary); font-size: 14px;
+            margin-top: 6px; line-height: 1.5;
+        }
+
         .footer {
-            text-align: center; padding: 30px; color: var(--text-secondary); font-size: 0.85em;
+            text-align: center; padding: 40px 24px;
+            color: var(--text-secondary); font-size: 13px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 24px;
+            line-height: 1.8;
         }
+        .donate-section {
+            margin: 24px 0 20px;
+            padding: 24px;
+            background: var(--bg-surface);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        .donate-section p {
+            font-size: 14px; color: var(--text-secondary);
+            margin-bottom: 14px; line-height: 1.6;
+        }
+        .donate-section p strong {
+            color: var(--text-primary); font-weight: 600;
+        }
+        .btn-donate {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 12px 28px;
+            background: var(--rausch); color: var(--bg-white);
+            border: none; border-radius: 50px;
+            font-size: 15px; font-weight: 600;
+            cursor: pointer; font-family: inherit;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            line-height: 1.25;
+        }
+        .btn-donate:hover {
+            background: var(--rausch-deep);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-1px);
+        }
+        .btn-donate:active { transform: scale(0.97); }
+
+        /* 赞赏弹窗 */
+        .donate-modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 1000;
+            align-items: center; justify-content: center; padding: 24px;
+        }
+        .donate-modal-overlay.show { display: flex; }
+        .donate-modal {
+            background: var(--bg-white); border-radius: 20px;
+            max-width: 360px; width: 100%;
+            text-align: center; animation: slideUp 0.3s ease;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+        .donate-modal-header {
+            padding: 20px 24px 0;
+            display: flex; justify-content: flex-end;
+        }
+        .donate-modal-body {
+            padding: 0 32px 28px;
+        }
+        .donate-modal-body h3 {
+            font-size: 20px; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 6px; letter-spacing: -0.18px;
+        }
+        .donate-modal-body .donate-subtitle {
+            font-size: 14px; color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        .donate-modal-body .donate-qr {
+            width: 220px; height: 220px; border-radius: 14px;
+            object-fit: cover; margin-bottom: 16px;
+        }
+        .donate-modal-body .donate-tip {
+            font-size: 13px; color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
         @media (max-width: 600px) {
-            .welcome-card { padding: 30px 24px; }
-            .header h1 { font-size: 1.4em; }
-            .stats-bar { gap: 15px; }
-            .stat-item .num { font-size: 1.3em; }
-            .vaccine-card { padding: 12px 14px; }
+            .welcome-card { padding: 32px 24px; }
+            .welcome-card h1 { font-size: 22px; }
+            .header h1 { font-size: 22px; }
+            .stats-bar { gap: 24px; }
+            .stat-item .num { font-size: 22px; }
+            .vaccine-card { padding: 16px 18px; }
             .filter-bar { gap: 6px; }
-            .filter-btn { padding: 6px 14px; font-size: 0.82em; }
-            .modal { border-radius: 16px; }
-            .calendar-bar { flex-direction: column; text-align: center; }
+            .filter-btn { padding: 8px 16px; font-size: 13px; }
+            .modal { border-radius: 16px; margin: 12px; }
+            .calendar-bar {
+                flex-direction: column; text-align: center;
+                padding: 20px;
+            }
+            .calendar-bar.stuck { padding: 12px 16px; }
+            .section-title { font-size: 20px; }
+            .container { padding: 16px; }
         }
     </style>
 </head>
@@ -413,7 +754,7 @@
         </div>
 
         <div class="tip-box">
-            <h3>💡 温馨提示</h3>
+            <h3>温馨提示</h3>
             <p>免费疫苗（一类）为国家免疫规划疫苗，必须接种。自费疫苗（二类）自愿接种，建议尽量接种。本计划已选择<b>五联疫苗</b>方案（替代免费百白破+脊灰+Hib，大幅减少针次）。点击卡片查看详情，勾选已接种的疫苗记录进度。</p>
         </div>
 
@@ -452,8 +793,27 @@
     </div>
 
     <div class="footer">
-        <p>数据来源于飞书疫苗计划表，仅供参考，具体请以当地社区卫生服务中心安排为准</p>
+        <div class="donate-section">
+            <p>这个工具是我作为新手奶爸为自己宝宝做的<br><strong>如果对你也有帮助，请我喝杯咖啡吧</strong></p>
+            <button class="btn-donate" onclick="openDonateModal()">&#9749; 请喝咖啡</button>
+        </div>
+        <p>仅供参考，具体请以当地社区卫生服务中心安排为准</p>
         <p>价格为参考价，实际价格以接种点为准</p>
+    </div>
+</div>
+
+<!-- ===== 赞赏弹窗 ===== -->
+<div class="donate-modal-overlay" id="donateModal">
+    <div class="donate-modal">
+        <div class="donate-modal-header">
+            <button class="modal-close" onclick="closeDonateModal()">&times;</button>
+        </div>
+        <div class="donate-modal-body">
+            <h3>感谢你的支持</h3>
+            <p class="donate-subtitle">微信扫码或长按识别赞赏</p>
+            <img class="donate-qr" src="donate.jpg" alt="微信赞赏码">
+            <p class="donate-tip">微信内打开可长按识别二维码<br>其他浏览器请截图后微信扫码</p>
+        </div>
     </div>
 </div>
 
@@ -461,13 +821,13 @@
 <div class="modal-overlay" id="calendarModal">
     <div class="modal">
         <div class="modal-header">
-            <h2>📅 订阅疫苗日历</h2>
+            <h2>订阅疫苗日历</h2>
             <button class="modal-close" onclick="closeCalendarModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="reminder-section">
                 <h3>提醒时间设置</h3>
-                <p style="font-size:0.82em;color:var(--text-secondary);margin-bottom:10px;">选择在接种日前多久收到日历提醒</p>
+                <p style="font-size:14px;color:var(--text-secondary);margin-bottom:12px;">选择在接种日前多久收到日历提醒</p>
                 <div class="reminder-options">
                     <button class="reminder-opt" onclick="setReminder(1, this)">提前1天</button>
                     <button class="reminder-opt" onclick="setReminder(3, this)">提前3天</button>
@@ -488,6 +848,7 @@
                     <button class="scope-opt active" onclick="setScope('all', this)">全部疫苗</button>
                     <button class="scope-opt" onclick="setScope('free', this)">仅免费</button>
                     <button class="scope-opt" onclick="setScope('paid', this)">仅自费</button>
+                    <button class="scope-opt" onclick="setScope('unchecked', this)">未接种</button>
                 </div>
             </div>
 
@@ -498,41 +859,41 @@
             </div>
 
             <!-- 订阅链接区域 -->
-            <div id="subscribeSection" style="display:none; margin-top: 20px;">
-                <div style="background:#F0FDF4; border:2px solid #86EFAC; border-radius:12px; padding:16px;">
-                    <h3 style="font-size:0.95em; color:#065F46; margin-bottom:8px;">你的订阅链接已生成</h3>
-                    <div style="display:flex; gap:8px; margin-bottom:12px;">
+            <div id="subscribeSection" style="display:none; margin-top: 24px;">
+                <div style="background:var(--bg-surface); border-radius:14px; padding:24px;">
+                    <h3 style="font-size:16px; font-weight:600; color:var(--text-primary); margin-bottom:12px;">订阅链接已生成</h3>
+                    <div style="display:flex; gap:8px; margin-bottom:16px;">
                         <input type="text" id="subscribeUrl" readonly
-                            style="flex:1; padding:10px 12px; border:2px solid #D1D5DB; border-radius:8px;
-                            font-size:0.82em; background:#fff; color:var(--text); outline:none;">
+                            style="flex:1; padding:12px 14px; border:1px solid var(--border-gray); border-radius:8px;
+                            font-size:13px; background:var(--bg-white); color:var(--text-primary); outline:none; font-family:inherit;">
                         <button onclick="copyUrl()" id="copyBtn"
-                            style="padding:10px 16px; background:var(--primary); color:white; border:none;
-                            border-radius:8px; font-weight:600; cursor:pointer; white-space:nowrap; font-size:0.88em;">
+                            style="padding:12px 20px; background:var(--text-primary); color:var(--bg-white); border:none;
+                            border-radius:8px; font-weight:600; cursor:pointer; white-space:nowrap; font-size:14px; font-family:inherit;">
                             复制
                         </button>
                     </div>
 
-                    <div style="background:white; border-radius:10px; padding:14px; margin-bottom: 8px;">
-                        <h4 style="font-size:0.9em; margin-bottom:8px;">📱 iPhone 订阅方法：</h4>
-                        <ol style="font-size:0.82em; color:var(--text-secondary); padding-left:18px; line-height:1.8;">
-                            <li>点击下方 <b>「一键订阅（iPhone）」</b> 按钮</li>
-                            <li>系统弹出「要订阅日历吗？」，点击 <b>「订阅」</b></li>
+                    <div style="background:var(--bg-white); border-radius:14px; padding:18px; margin-bottom: 10px; box-shadow:var(--shadow-subtle);">
+                        <h4 style="font-size:14px; font-weight:600; margin-bottom:10px; color:var(--text-primary);">iPhone 订阅方法</h4>
+                        <ol style="font-size:14px; color:var(--text-secondary); padding-left:18px; line-height:2;">
+                            <li>点击下方 <b style="color:var(--text-primary);">「一键订阅（iPhone）」</b> 按钮</li>
+                            <li>系统弹出「要订阅日历吗？」，点击 <b style="color:var(--text-primary);">「订阅」</b></li>
                             <li>打开「日历」App 即可看到所有疫苗日程</li>
                         </ol>
                     </div>
 
-                    <div style="background:white; border-radius:10px; padding:14px; margin-bottom: 8px;">
-                        <h4 style="font-size:0.9em; margin-bottom:8px;">📱 安卓手机订阅方法：</h4>
-                        <ol style="font-size:0.82em; color:var(--text-secondary); padding-left:18px; line-height:1.8;">
+                    <div style="background:var(--bg-white); border-radius:14px; padding:18px; margin-bottom: 10px; box-shadow:var(--shadow-subtle);">
+                        <h4 style="font-size:14px; font-weight:600; margin-bottom:10px; color:var(--text-primary);">安卓手机订阅方法</h4>
+                        <ol style="font-size:14px; color:var(--text-secondary); padding-left:18px; line-height:2;">
                             <li>复制上方链接</li>
                             <li>打开 Google 日历 → 设置 → 添加日历 → 通过 URL 订阅</li>
                             <li>粘贴链接并确认</li>
                         </ol>
                     </div>
 
-                    <div style="background:white; border-radius:10px; padding:14px;">
-                        <h4 style="font-size:0.9em; margin-bottom:8px;">💻 电脑订阅方法：</h4>
-                        <ol style="font-size:0.82em; color:var(--text-secondary); padding-left:18px; line-height:1.8;">
+                    <div style="background:var(--bg-white); border-radius:14px; padding:18px; box-shadow:var(--shadow-subtle);">
+                        <h4 style="font-size:14px; font-weight:600; margin-bottom:10px; color:var(--text-primary);">电脑订阅方法</h4>
+                        <ol style="font-size:14px; color:var(--text-secondary); padding-left:18px; line-height:2;">
                             <li>macOS 日历：菜单 → 文件 → 新建日历订阅 → 粘贴链接</li>
                             <li>Outlook：添加日历 → 从 Internet → 粘贴链接</li>
                         </ol>
@@ -542,10 +903,10 @@
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeCalendarModal()">取消</button>
-            <button class="btn-download" onclick="generateSubscribeUrl()" id="btnGenerate">🔗 生成订阅链接</button>
-            <a id="btnWebcal" href="#" style="display:none; padding:10px 20px; background:linear-gradient(135deg,#2563EB,#3B82F6);
-                color:white; border:none; border-radius:10px; font-size:0.95em; font-weight:600;
-                text-decoration:none; cursor:pointer;">📱 一键订阅（iPhone）</a>
+            <button class="btn-download" onclick="generateSubscribeUrl()" id="btnGenerate">生成订阅链接</button>
+            <a id="btnWebcal" href="#" style="display:none; padding:12px 24px; background:var(--rausch);
+                color:var(--bg-white); border:none; border-radius:8px; font-size:14px; font-weight:600;
+                text-decoration:none; cursor:pointer; font-family:inherit; transition:background 0.2s;">一键订阅（iPhone）</a>
         </div>
     </div>
 </div>
@@ -754,6 +1115,57 @@ function toggleCheck(age, name) {
     render();
 }
 
+// ===== 备注编辑 =====
+function noteKey(age, name) { return `note_${age}_${name}`; }
+function getNote(age, name) { return localStorage.getItem(noteKey(age, name)) || ''; }
+function getDefaultNote(age, name) {
+    for (const g of vaccineData) {
+        if (g.age === age) {
+            const v = g.vaccines.find(v => v.name === name);
+            if (v) return v.note;
+        }
+    }
+    return '';
+}
+function startEditNote(age, name, cid) {
+    const currentNote = getNote(age, name) || getDefaultNote(age, name);
+    const safeAge = age.replace(/'/g, "\\'");
+    const safeName = name.replace(/'/g, "\\'");
+    const container = document.getElementById('ne_' + cid);
+    container.style.display = 'block';
+    document.getElementById('nt_' + cid).style.display = 'none';
+    container.innerHTML = `<textarea class="note-textarea" id="nta_${cid}">${currentNote.replace(/</g,'&lt;')}</textarea>
+        <div class="note-actions">
+            <button class="note-save" onclick="event.stopPropagation();saveNote('${safeAge}','${safeName}','${cid}')">保存</button>
+            <button class="note-cancel" onclick="event.stopPropagation();cancelEditNote('${cid}')">取消</button>
+            <button class="note-reset" onclick="event.stopPropagation();resetNote('${safeAge}','${safeName}','${cid}')">恢复默认</button>
+        </div>`;
+    const ta = document.getElementById('nta_' + cid);
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+function saveNote(age, name, cid) {
+    const ta = document.getElementById('nta_' + cid);
+    const val = ta.value.trim();
+    if (val && val !== getDefaultNote(age, name)) {
+        localStorage.setItem(noteKey(age, name), val);
+    } else if (val === getDefaultNote(age, name)) {
+        localStorage.removeItem(noteKey(age, name));
+    } else {
+        localStorage.removeItem(noteKey(age, name));
+    }
+    document.getElementById('nt_' + cid).textContent = val || getDefaultNote(age, name);
+    cancelEditNote(cid);
+}
+function cancelEditNote(cid) {
+    document.getElementById('ne_' + cid).style.display = 'none';
+    document.getElementById('nt_' + cid).style.display = '';
+}
+function resetNote(age, name, cid) {
+    localStorage.removeItem(noteKey(age, name));
+    document.getElementById('nta_' + cid).value = getDefaultNote(age, name);
+}
+
 // ===== 筛选 =====
 function filterVaccines(filter, btn) {
     currentFilter = filter;
@@ -819,7 +1231,11 @@ function render() {
                 <div class="detail-row"><span class="detail-label">剂次</span><span>${v.dose}</span></div>
                 <div class="detail-row"><span class="detail-label">推荐品牌</span><span>${v.brand}</span></div>
                 <div class="detail-row"><span class="detail-label">价格</span><span>${v.price}</span></div>
-                <div class="detail-row"><span class="detail-label">备注</span><span>${v.note}</span></div>
+                <div class="note-row">
+                    <div class="detail-label">备注 <button class="note-edit-btn" onclick="event.stopPropagation();startEditNote('${group.age}','${safeName}','${cid}')">编辑</button></div>
+                    <div class="note-text" id="nt_${cid}">${getNote(group.age, v.name) || v.note}</div>
+                    <div id="ne_${cid}" style="display:none"></div>
+                </div>
             </div>`;
             card.onclick = () => document.getElementById(cid).classList.toggle('show');
             div.appendChild(card);
@@ -930,6 +1346,31 @@ function getSubscribeUrl(protocol) {
         reminder: reminderDays,
         scope: calendarScope
     });
+    // 未接种模式：传已勾选的疫苗索引给服务器排除
+    if (calendarScope === 'unchecked') {
+        const excludes = [];
+        let idx = 0;
+        vaccineData.forEach(group => {
+            group.vaccines.forEach(v => {
+                if (isChecked(group.age, v.name)) excludes.push(idx);
+                idx++;
+            });
+        });
+        if (excludes.length > 0) params.set('exclude', excludes.join(','));
+    }
+    // 传自定义备注
+    const customNotes = {};
+    let nIdx = 0;
+    vaccineData.forEach(group => {
+        group.vaccines.forEach(v => {
+            const cn = getNote(group.age, v.name);
+            if (cn) customNotes[nIdx] = cn;
+            nIdx++;
+        });
+    });
+    if (Object.keys(customNotes).length > 0) {
+        params.set('notes', JSON.stringify(customNotes));
+    }
     const base = window.location.origin + '/api/calendar?' + params.toString();
     if (protocol === 'webcal') {
         return base.replace(/^https?:/, 'webcal:');
@@ -957,8 +1398,8 @@ function copyUrl() {
     navigator.clipboard.writeText(input.value).then(() => {
         const btn = document.getElementById('copyBtn');
         btn.textContent = '已复制!';
-        btn.style.background = '#059669';
-        setTimeout(() => { btn.textContent = '复制'; btn.style.background = 'var(--primary)'; }, 2000);
+        btn.style.background = 'var(--success)';
+        setTimeout(() => { btn.textContent = '复制'; btn.style.background = 'var(--text-primary)'; }, 2000);
     }).catch(() => {
         // fallback
         document.execCommand('copy');
@@ -981,6 +1422,27 @@ openCalendarModal = function() {
 // 点击遮罩关闭
 document.getElementById('calendarModal').addEventListener('click', function(e) {
     if (e.target === this) closeCalendarModal();
+});
+
+// ===== 日历栏吸顶 =====
+const calendarBar = document.querySelector('.calendar-bar');
+if (calendarBar) {
+    const observer = new IntersectionObserver(
+        ([e]) => calendarBar.classList.toggle('stuck', e.intersectionRatio < 1),
+        { threshold: [1], rootMargin: '-1px 0px 0px 0px' }
+    );
+    observer.observe(calendarBar);
+}
+
+// ===== 赞赏弹窗 =====
+function openDonateModal() {
+    document.getElementById('donateModal').classList.add('show');
+}
+function closeDonateModal() {
+    document.getElementById('donateModal').classList.remove('show');
+}
+document.getElementById('donateModal').addEventListener('click', function(e) {
+    if (e.target === this) closeDonateModal();
 });
 </script>
 </body>

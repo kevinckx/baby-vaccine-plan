@@ -70,7 +70,40 @@ const vaccineData = [
 function pad2(n) { return n < 10 ? '0' + n : '' + n; }
 
 function toICSDate(date) {
-    return date.getUTCFullYear() + pad2(date.getUTCMonth() + 1) + pad2(date.getUTCDate());
+    // Use local date values (not UTC) since we set dates with local constructor
+    return date.getFullYear() + pad2(date.getMonth() + 1) + pad2(date.getDate());
+}
+
+// ICS spec requires lines to be max 75 octets. Fold long lines.
+function foldLine(line) {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(line);
+    if (bytes.length <= 75) return line;
+
+    const lines = [];
+    let start = 0;
+    let isFirst = true;
+    while (start < bytes.length) {
+        const maxLen = isFirst ? 75 : 74; // continuation lines have leading space
+        let end = start + maxLen;
+        if (end >= bytes.length) {
+            end = bytes.length;
+        } else {
+            // Don't split in the middle of a multi-byte UTF-8 character
+            while (end > start && (bytes[end] & 0xC0) === 0x80) {
+                end--;
+            }
+        }
+        const chunk = new TextDecoder().decode(bytes.slice(start, end));
+        if (isFirst) {
+            lines.push(chunk);
+            isFirst = false;
+        } else {
+            lines.push(' ' + chunk);
+        }
+        start = end;
+    }
+    return lines.join('\r\n');
 }
 
 function escapeICS(str) {
@@ -78,9 +111,13 @@ function escapeICS(str) {
 }
 
 function getVaccineDate(birthDate, monthOffset) {
-    const d = new Date(birthDate);
-    d.setMonth(d.getMonth() + monthOffset);
+    const d = new Date(birthDate.getFullYear(), birthDate.getMonth() + monthOffset, birthDate.getDate());
     return d;
+}
+
+function generateUID(birthStr, idx) {
+    // Stable UID for each vaccine event
+    return `vaccine-${birthStr}-${idx}@baby-vaccine-plan`;
 }
 
 export async function onRequest(context) {
@@ -89,6 +126,10 @@ export async function onRequest(context) {
     const birthStr = url.searchParams.get('birth');
     const reminder = parseInt(url.searchParams.get('reminder')) || 7;
     const scope = url.searchParams.get('scope') || 'all';
+    const excludeStr = url.searchParams.get('exclude') || '';
+    const excludeSet = new Set(excludeStr ? excludeStr.split(',').map(Number) : []);
+    let customNotes = {};
+    try { customNotes = JSON.parse(url.searchParams.get('notes') || '{}'); } catch(e) {}
 
     if (!birthStr || !/^\d{4}-\d{2}-\d{2}$/.test(birthStr)) {
         return new Response('Missing or invalid birth parameter (format: YYYY-MM-DD)', { status: 400 });
@@ -99,12 +140,16 @@ export async function onRequest(context) {
 
     // 筛选疫苗
     let items = [];
+    let globalIdx = 0;
     vaccineData.forEach(group => {
         const vDate = getVaccineDate(birthDate, group.monthOffset);
         group.vaccines.forEach(v => {
+            const idx = globalIdx++;
+            if (scope === 'unchecked' && excludeSet.has(idx)) return;
             if (scope === 'free' && v.type !== 'free') return;
             if (scope === 'paid' && v.type !== 'paid') return;
-            items.push({ ...v, date: vDate, age: group.age });
+            const note = customNotes[idx] || v.note;
+            items.push({ ...v, note, date: vDate, age: group.age, idx });
         });
     });
 
@@ -113,66 +158,66 @@ export async function onRequest(context) {
     const stamp = now.getUTCFullYear() + pad2(now.getUTCMonth()+1) + pad2(now.getUTCDate()) + 'T' +
                   pad2(now.getUTCHours()) + pad2(now.getUTCMinutes()) + pad2(now.getUTCSeconds()) + 'Z';
 
-    let lines = [
+    let rawLines = [
         'BEGIN:VCALENDAR',
         'VERSION:2.0',
-        'PRODID:-//BabyVaccinePlan//CN',
+        'PRODID:-//BabyVaccinePlan//Baby Vaccine Plan//CN',
         'CALSCALE:GREGORIAN',
         'METHOD:PUBLISH',
-        `X-WR-CALNAME:${escapeICS(name)}的疫苗接种计划`,
+        'X-WR-CALNAME:' + escapeICS(name) + '的疫苗接种计划',
         'X-WR-TIMEZONE:Asia/Shanghai',
-        // 刷新间隔：每天刷新一次
         'REFRESH-INTERVAL;VALUE=DURATION:P1D',
         'X-PUBLISHED-TTL:P1D'
     ];
 
     items.forEach((it, idx) => {
-        const endDate = new Date(it.date);
-        endDate.setDate(endDate.getDate() + 1);
+        const endDate = new Date(it.date.getFullYear(), it.date.getMonth(), it.date.getDate() + 1);
 
         const desc = [
-            `疫苗: ${it.name}`,
-            `预防: ${it.prevent}`,
-            `剂次: ${it.dose}`,
-            `类型: ${it.type === 'free' ? '免费（一类）' : '自费（二类）'}`,
-            `价格: ${it.price}`,
-            `品牌: ${it.brand}`,
-            `备注: ${it.note}`
+            '疫苗: ' + it.name,
+            '预防: ' + it.prevent,
+            '剂次: ' + it.dose,
+            '类型: ' + (it.type === 'free' ? '免费（一类）' : '自费（二类）'),
+            '价格: ' + it.price,
+            '品牌: ' + it.brand,
+            '备注: ' + it.note
         ].join('\\n');
 
-        const uid = `vaccine-${birthStr}-${idx}@baby-vaccine-plan`;
+        const uid = generateUID(birthStr, idx);
 
-        lines.push('BEGIN:VEVENT');
-        lines.push(`UID:${uid}`);
-        lines.push(`DTSTAMP:${stamp}`);
-        lines.push(`DTSTART;VALUE=DATE:${toICSDate(it.date)}`);
-        lines.push(`DTEND;VALUE=DATE:${toICSDate(endDate)}`);
-        lines.push(`SUMMARY:💉 ${escapeICS(name)} - ${escapeICS(it.name)}`);
-        lines.push(`DESCRIPTION:${escapeICS(desc)}`);
-        lines.push('LOCATION:社区卫生服务中心');
+        rawLines.push('BEGIN:VEVENT');
+        rawLines.push('UID:' + uid);
+        rawLines.push('DTSTAMP:' + stamp);
+        rawLines.push('DTSTART;VALUE=DATE:' + toICSDate(it.date));
+        rawLines.push('DTEND;VALUE=DATE:' + toICSDate(endDate));
+        rawLines.push('SUMMARY:' + escapeICS(name) + ' - ' + escapeICS(it.name));
+        rawLines.push('DESCRIPTION:' + escapeICS(desc));
+        rawLines.push('STATUS:CONFIRMED');
+        rawLines.push('TRANSP:TRANSPARENT');
         // 提前 N 天提醒
-        lines.push('BEGIN:VALARM');
-        lines.push('ACTION:DISPLAY');
-        lines.push(`DESCRIPTION:${escapeICS(name)}的疫苗接种提醒: ${escapeICS(it.name)}`);
-        lines.push(`TRIGGER:-P${reminder}D`);
-        lines.push('END:VALARM');
+        rawLines.push('BEGIN:VALARM');
+        rawLines.push('ACTION:DISPLAY');
+        rawLines.push('DESCRIPTION:疫苗接种提醒');
+        rawLines.push('TRIGGER:-P' + reminder + 'D');
+        rawLines.push('END:VALARM');
         // 当天早上提醒
-        lines.push('BEGIN:VALARM');
-        lines.push('ACTION:DISPLAY');
-        lines.push(`DESCRIPTION:今天要带${escapeICS(name)}去接种: ${escapeICS(it.name)}`);
-        lines.push('TRIGGER:-PT2H');
-        lines.push('END:VALARM');
-        lines.push('END:VEVENT');
+        rawLines.push('BEGIN:VALARM');
+        rawLines.push('ACTION:DISPLAY');
+        rawLines.push('DESCRIPTION:今天要去接种疫苗');
+        rawLines.push('TRIGGER:-PT2H');
+        rawLines.push('END:VALARM');
+        rawLines.push('END:VEVENT');
     });
 
-    lines.push('END:VCALENDAR');
+    rawLines.push('END:VCALENDAR');
 
-    const icsContent = lines.join('\r\n');
+    // Apply ICS line folding to each line
+    const foldedLines = rawLines.map(line => foldLine(line));
+    const icsContent = foldedLines.join('\r\n') + '\r\n';
 
     return new Response(icsContent, {
         headers: {
             'Content-Type': 'text/calendar; charset=utf-8',
-            'Content-Disposition': `attachment; filename="${encodeURIComponent(name)}的疫苗计划.ics"`,
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Access-Control-Allow-Origin': '*'
         }
